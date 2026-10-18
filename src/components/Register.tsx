@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { useState } from "react"
-import { supabase } from "@/data/supabase"
+import { supabase, PAYMENT_BUCKET } from "@/data/supabase"
 import { toast } from "sonner"
 
 export function RegisterForm({
@@ -24,25 +24,32 @@ export function RegisterForm({
   })
   const [college, setCollege] = useState("");
   const [collegeName, setCollegeName] = useState("");
-  const [file, setFile] = useState<any>();
+  const [file, setFile] = useState<File>();
   const navigate = useNavigate();
 
   const onSubmit = async () => {
     try {
-      let formData = {...data};
-      console.log({data,college})
+      if (!file) {
+        toast("Please upload the payment screenshot");
+        return;
+      }
+      const formData = {...data, screenshot: ""};
       if(college === "MLRIT")
         formData.college = "MLRIT";
       else
         formData.college = collegeName;
-      const { error: fileError } = await supabase.storage.from('bucket_name').upload('file_path', file)
+      const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
+      const filePath = `${crypto.randomUUID()}.${ext}`;
+      const { error: fileError } = await supabase.storage.from(PAYMENT_BUCKET).upload(filePath, file)
       if (fileError) {
-        // Handle error
+        console.error(fileError);
+        toast("Screenshot upload failed, please try again");
+        return;
       }
+      formData.screenshot = filePath;
       const { error } = await supabase
       .from('registrations')
-      .insert(formData)
-      .select();
+      .insert(formData);
       if(error === null){
         toast("Registered Successfully!");
         navigate("/");

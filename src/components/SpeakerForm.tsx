@@ -31,16 +31,14 @@ export function SpeakerForm({
 
   const onSubmit = async () => {
     try {
-      let formData = { ...data };
-      console.log({ data, college })
+      const formData = { ...data };
       if (college === "MYSELF")
         formData.nominee = "MYSELF";
       else
         formData.nominee = collegeName;
       const { error } = await supabase
         .from('speakers')
-        .insert(formData)
-        .select();
+        .insert(formData);
       if (error === null) {
         toast("Registered Successfully!");
         navigate("/");

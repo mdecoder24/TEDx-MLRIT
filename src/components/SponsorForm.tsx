@@ -32,7 +32,7 @@ export function SponsorForm({
 
   const onSubmit = async () => {
     try {
-      let formData = {...data};
+      const formData = {...data};
       if(a === "OTHERS")
         formData.sponsorship = sponsorship;
       else
@@ -44,8 +44,7 @@ export function SponsorForm({
       formData.follow_up = follow_up;
       const { error } = await supabase
       .from('sponsors')
-      .insert(formData)
-      .select();
+      .insert(formData);
       if(error === null){
         toast("Registered Successfully!");
         navigate("/");
