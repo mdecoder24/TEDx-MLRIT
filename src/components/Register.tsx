@@ -2,78 +2,28 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useNavigate } from "react-router"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { useState } from "react"
-import { supabase, PAYMENT_BUCKET } from "@/data/supabase"
-import { toast } from "sonner"
+import { SubmissionSuccess } from "./SubmissionSuccess"
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [data, setData] = useState({
-    name:"",
-    email:"",
-    phone:"",
-    college:"",
-    year:"",
-    department:"",
-    section:"",
-    rollNumber:""
-  })
   const [college, setCollege] = useState("");
-  const [collegeName, setCollegeName] = useState("");
-  const [file, setFile] = useState<File>();
-  const navigate = useNavigate();
+  const [submitted, setSubmitted] = useState(false);
 
-  const onSubmit = async () => {
-    if (!supabase) {
-      toast("Submissions are temporarily unavailable, please try again later");
-      return;
-    }
-    try {
-      if (!file) {
-        toast("Please upload the payment screenshot");
-        return;
-      }
-      const formData = {...data, screenshot: ""};
-      if(college === "MLRIT")
-        formData.college = "MLRIT";
-      else
-        formData.college = collegeName;
-      const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      const filePath = `${crypto.randomUUID()}.${ext}`;
-      const { error: fileError } = await supabase.storage.from(PAYMENT_BUCKET).upload(filePath, file)
-      if (fileError) {
-        console.error(fileError);
-        toast("Screenshot upload failed, please try again");
-        return;
-      }
-      formData.screenshot = filePath;
-      const { error } = await supabase
-      .from('registrations')
-      .insert(formData);
-      if(error === null){
-        toast("Registered Successfully!");
-        navigate("/");
-        return;
-      }
-      console.error(error);
-    } catch (error) {
-      console.error(error);
-    }
-    toast("Something Went Wrong!")
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitted(true);
   }
 
-  const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
-    setData({...data,[e.target.name]:e.target.value});
-  }
-
-  const onFileUpload = (e : React.ChangeEvent<HTMLInputElement>) => {
-    if(e.target.files){
-      setFile(e.target.files[0]);
-    }
+  if (submitted) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <SubmissionSuccess message="Thank you for registering for TEDxMLRIT. We'll be in touch with your ticket details soon." />
+      </div>
+    )
   }
 
   return (
@@ -81,7 +31,7 @@ export function RegisterForm({
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 grid-cols-1 md:grid-cols-2">
           <div className="p-6 md:p-8">
-            <div className="flex flex-col gap-6">
+            <form onSubmit={onSubmit} className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Register Now</h1>
                 <p className="text-balance text-muted-foreground">
@@ -95,7 +45,6 @@ export function RegisterForm({
                   type="text"
                   placeholder="John Doe"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -105,7 +54,6 @@ export function RegisterForm({
                   type="email"
                   placeholder="john.doe@example.com"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -115,7 +63,6 @@ export function RegisterForm({
                   type="tel"
                   placeholder="9876543210"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -138,7 +85,6 @@ export function RegisterForm({
                     type="text"
                     placeholder="1"
                     required
-                    onChange={onChange}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -148,7 +94,6 @@ export function RegisterForm({
                     type="text"
                     placeholder="Computer Science"
                     required
-                    onChange={onChange}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -158,7 +103,6 @@ export function RegisterForm({
                     type="text"
                     placeholder="A"
                     required
-                    onChange={onChange}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -168,7 +112,6 @@ export function RegisterForm({
                     type="text"
                     placeholder=""
                     required
-                    onChange={onChange}
                   />
                 </div>
               </>}
@@ -180,7 +123,6 @@ export function RegisterForm({
                     type="text"
                     placeholder="JNTU Hyderabad"
                     required
-                    onChange={(e) => setCollegeName(e.target.value)}
                   />
                 </div>
               </>}
@@ -190,19 +132,18 @@ export function RegisterForm({
                   name="screenshot"
                   type="file"
                   required
-                  onChange={onFileUpload}
                 />
               </div>
               <a href="/QR.jpeg" download={true}
                 className="bg-amber-100 md:hidden text-black px-8 py-3 rounded-2xl text-center  hover:bg-[#E50914]/90 transition-colors text-lg whitespace-nowrap mt-4">
                 Click here to download QR
               </a>
-              <button onClick={() => onSubmit()} type="button"
+              <button type="submit"
                 className="bg-[#E50914] text-white px-8 py-3 rounded-2xl text-center  hover:bg-[#E50914]/90 transition-colors text-lg whitespace-nowrap mt-4">
                 Register Now
               </button>
 
-            </div>
+            </form>
           </div>
           <div className="relative hidden md:block">
             <img

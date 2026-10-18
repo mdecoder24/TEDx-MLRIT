@@ -2,61 +2,29 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useNavigate } from "react-router"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { useState } from "react"
-import { supabase } from "@/data/supabase"
-import { toast } from "sonner"
+import { SubmissionSuccess } from "./SubmissionSuccess"
 import { Textarea } from "./ui/textarea"
 
 export function SpeakerForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [data, setData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    nominee: "",
-    talk_title: "",
-    idea_brief: "",
-    idea_worth: "",
-    bio: "",
-    link: "",
-    consent: "",
-  })
   const [college, setCollege] = useState("");
-  const [collegeName, setCollegeName] = useState("");
-  const navigate = useNavigate();
+  const [submitted, setSubmitted] = useState(false);
 
-  const onSubmit = async () => {
-    if (!supabase) {
-      toast("Submissions are temporarily unavailable, please try again later");
-      return;
-    }
-    try {
-      const formData = { ...data };
-      if (college === "MYSELF")
-        formData.nominee = "MYSELF";
-      else
-        formData.nominee = collegeName;
-      const { error } = await supabase
-        .from('speakers')
-        .insert(formData);
-      if (error === null) {
-        toast("Registered Successfully!");
-        navigate("/");
-        return;
-      }
-      console.error(error);
-    } catch (error) {
-      console.error(error);
-    }
-    toast("Something Went Wrong!")
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSubmitted(true);
   }
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+  if (submitted) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <SubmissionSuccess message="Thank you for your speaker nomination. Our team will review it and get back to you." />
+      </div>
+    )
   }
 
   return (
@@ -64,7 +32,7 @@ export function SpeakerForm({
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <div className="p-6 md:p-8">
-            <div className="flex flex-col gap-6">
+            <form onSubmit={onSubmit} className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Become a Speaker</h1>
                 <p className="text-balance text-muted-foreground">
@@ -78,7 +46,6 @@ export function SpeakerForm({
                   type="text"
                   placeholder="John Doe"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -88,7 +55,6 @@ export function SpeakerForm({
                   type="email"
                   placeholder="john.doe@example.com"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -98,7 +64,6 @@ export function SpeakerForm({
                   type="tel"
                   placeholder="9876543210"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -121,7 +86,6 @@ export function SpeakerForm({
                     type="text"
                     placeholder="JNTU Hyderabad"
                     required
-                    onChange={(e) => setCollegeName(e.target.value)}
                   />
                 </div>
               </>}
@@ -131,7 +95,6 @@ export function SpeakerForm({
                   type="text"
                   required
                   name="talk_title"
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -139,7 +102,6 @@ export function SpeakerForm({
                 <Textarea // Textarea
                   required
                   name="idea_brief"
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -147,7 +109,6 @@ export function SpeakerForm({
                 <Textarea // Textarea
                   name="idea_worth"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -155,7 +116,6 @@ export function SpeakerForm({
                 <Textarea // Textarea
                   name="bio"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
@@ -164,12 +124,11 @@ export function SpeakerForm({
                   type="text"
                   name="link"
                   required
-                  onChange={onChange}
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="consent">Do you agree to follow TEDx content guidelines?</Label>
-                <Select onValueChange={(value) => setData({...data,'consent':value})}>
+                <Select>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Option" />
                   </SelectTrigger>
@@ -179,12 +138,12 @@ export function SpeakerForm({
                   </SelectContent>
                 </Select>
               </div>
-              <button onClick={() => onSubmit()} type="button"
+              <button type="submit"
                 className="bg-[#E50914] text-white px-8 py-3 rounded-2xl text-center  hover:bg-[#E50914]/90 transition-colors text-lg whitespace-nowrap mt-4">
                 Register Now
               </button>
 
-            </div>
+            </form>
           </div>
           <div className="relative hidden md:block">
             <img
