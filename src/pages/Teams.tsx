@@ -1,9 +1,11 @@
 import { MemberCard } from '@/components/MemberCard';
 import { team } from '@/data/team';
+import { MemberProps } from '@/data/types';
+import { Fragment } from 'react';
 
-function groupBy(array: any[], key: string): { [key: string]: any[] } {
-    return array.reduce((result, currentValue) => {
-    const group = currentValue[key];
+function groupBy(array: MemberProps[], key: keyof MemberProps): { [key: string]: MemberProps[] } {
+    return array.reduce<{ [key: string]: MemberProps[] }>((result, currentValue) => {
+    const group = String(currentValue[key]);
     if (!result[group]) {
     result[group] = [];
     }
@@ -12,7 +14,7 @@ function groupBy(array: any[], key: string): { [key: string]: any[] } {
     }, {});
     }
 
-let data = groupBy(team.sort((x,y) => x.order - y.order), 'title')
+const data = groupBy([...team].sort((x,y) => x.order - y.order), 'title')
 
 
 export default function TeamsPage() {
@@ -23,7 +25,7 @@ export default function TeamsPage() {
             <section className="py-28 bg-black">
                 <div className="container mx-auto px-6">
                     <h2 className="text-4xl font-bold text-center mb-12 text-white">Our Team</h2>
-                    {Object.keys(data).map(x => <>
+                    {Object.keys(data).map(x => <Fragment key={x}>
                         <h4 className='text-2xl font-bold text-center mb-6 text-white'>{x}</h4>
                         <div className="overflow-x-auto relative">
                         <div className="grid grid-cols-1 md:grid md:grid-cols-4 space-x-6 pb-8 transition-transform duration-300">
@@ -32,7 +34,7 @@ export default function TeamsPage() {
                                 ))}
                             </div>
                         </div>
-                    </>)}
+                    </Fragment>)}
                 </div>
             </section>
         </>

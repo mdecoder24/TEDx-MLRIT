@@ -6,14 +6,13 @@
 
 <h2>🛠️ Installation Steps:</h2>
 
-<p>1. npm i --legacy-peer-dep npm run dev</p>
+1. `npm install`
+2. Copy `.env.example` to `.env.local` and fill in your Supabase project URL and anon key
+3. `npm run dev`
+4. `npm run build` for production
 
-<p>2. npm run build</p>
+On Vercel, set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Project Settings → Environment Variables. To set up the database, run `supabase/schema.sql` in the Supabase SQL editor.
 
-<p>3. npm run dev</p>
-
-  
-  
 <h2>💻 Built with</h2>
 
 Technologies used in the project:
