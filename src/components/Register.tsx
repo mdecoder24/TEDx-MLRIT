@@ -28,6 +28,10 @@ export function RegisterForm({
   const navigate = useNavigate();
 
   const onSubmit = async () => {
+    if (!supabase) {
+      toast("Submissions are temporarily unavailable, please try again later");
+      return;
+    }
     try {
       if (!file) {
         toast("Please upload the payment screenshot");

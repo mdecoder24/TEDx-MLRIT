@@ -31,6 +31,10 @@ export function SponsorForm({
   const navigate = useNavigate();
 
   const onSubmit = async () => {
+    if (!supabase) {
+      toast("Submissions are temporarily unavailable, please try again later");
+      return;
+    }
     try {
       const formData = {...data};
       if(a === "OTHERS")

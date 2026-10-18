@@ -8,7 +8,7 @@ export default defineConfig(({ command, mode }) => {
   if (command === 'build') {
     const env = loadEnv(mode, process.cwd(), 'VITE_')
     const missing = ['VITE_SUPABASE_URL', 'VITE_SUPABASE_ANON_KEY'].filter((k) => !env[k])
-    if (missing.length) throw new Error(`Missing env vars: ${missing.join(', ')}`)
+    if (missing.length) console.warn(`\n[warn] Missing env vars: ${missing.join(', ')} - form submissions will be disabled in this build\n`)
   }
 
   return {
