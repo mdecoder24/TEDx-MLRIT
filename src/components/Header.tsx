@@ -4,9 +4,14 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useCallback, useState } from "react"
+import { SoldOutDialog } from "./SoldOutDialog"
 
 
 export default function Header() {
+    const [soldOutOpen, setSoldOutOpen] = useState(false);
+    const closeSoldOut = useCallback(() => setSoldOutOpen(false), []);
+
     return (
         <>
             <header className="fixed w-full z-50 bg-black/90 backdrop-blur-sm">
@@ -24,10 +29,10 @@ export default function Header() {
                         <a href="/team" className="text-white hover:text-[#E50914] transition-colors">Team</a>
                         {/* <a href="#gallery" className="text-white hover:text-[#E50914] transition-colors">Gallery</a> */}
                         <a href="/#blogs" className="text-white hover:text-[#E50914] transition-colors">Blogs</a>
-                        <a href="https://unifest.in/fests/55?fest=tedxmlrit"
+                        <button type="button" onClick={() => setSoldOutOpen(true)}
                             className="bg-[#E50914] text-white px-6 py-2 !rounded-button hover:bg-[#E50914]/90 transition-colors whitespace-nowrap">
                             Get Tickets
-                        </a>
+                        </button>
                     </div>
                     <div className="md:hidden">
                         <DropdownMenu>
@@ -40,10 +45,10 @@ export default function Header() {
                                 <DropdownMenuItem><a href="/sponsors" className="text-white hover:text-[#E50914] transition-colors">Sponsors</a></DropdownMenuItem>
                                 <DropdownMenuItem><a href="/team" className="text-white hover:text-[#E50914] transition-colors">Team</a></DropdownMenuItem>
                                 <DropdownMenuItem><a href="/#blogs" className="text-white hover:text-[#E50914] transition-colors">Blogs</a></DropdownMenuItem>
-                                <DropdownMenuItem><a href="https://unifest.in/fests/55?fest=tedxmlrit"
+                                <DropdownMenuItem onSelect={() => setSoldOutOpen(true)}><span
                                 className="bg-[#E50914] text-white px-6 py-2 !rounded-button hover:bg-[#E50914]/90 transition-colors whitespace-nowrap">
                                 Get Tickets
-                            </a></DropdownMenuItem>
+                            </span></DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -53,6 +58,7 @@ export default function Header() {
                     </button> */}
                 </nav>
             </header>
+            <SoldOutDialog open={soldOutOpen} onClose={closeSoldOut} />
         </>
     )
 }

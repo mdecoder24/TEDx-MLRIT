@@ -1,7 +1,11 @@
 import { config } from "@/data/config";
-import { Link } from "react-router";
+import { useCallback, useState } from "react";
+import { SoldOutDialog } from "./SoldOutDialog";
 
 export default function Hero() {
+    const [soldOutOpen, setSoldOutOpen] = useState(false);
+    const closeSoldOut = useCallback(() => setSoldOutOpen(false), []);
+
     return (
         <>
             <section className="relative min-h-screen flex items-center bg-[url('https://public.readdy.ai/ai/img_res/845b6a06d103e787ab65037b0342dc95.jpg')] bg-cover"
@@ -13,10 +17,10 @@ export default function Hero() {
                         <p className="text-xl mb-8">Every idea leaves a mark. Every voice shapes what’s next. Be part of a journey
                             that explores the future through bold ideas and fresh perspectives.</p>
                         <p className="text-2xl font-bold mb-8">THEME: Echoes Of Tomorrow</p>
-                        <Link to={"https://unifest.in/fests/55?fest=tedxmlrit"}
+                        <button type="button" onClick={() => setSoldOutOpen(true)}
                             className="bg-[#E50914] text-white px-8 py-3 !rounded-button hover:bg-[#E50914]/90 transition-colors text-lg whitespace-nowrap mt-4">
                             Purchase Tickets
-                        </Link>
+                        </button>
                     </div>
                 </div>
                 <div className="fixed right-6 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4 z-20">
@@ -30,6 +34,7 @@ export default function Hero() {
                     </a>
                 </div>
             </section>
+            <SoldOutDialog open={soldOutOpen} onClose={closeSoldOut} />
         </>
     )
 }
